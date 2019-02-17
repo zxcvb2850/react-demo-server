@@ -11,8 +11,11 @@ router.post('/login', async (ctx) => {
   const { user, pwd } = ctx.request.body
   const data = await User.findOne({ user, pwd: utility.md5(pwd) }, _filter)
   if (data) {
+    console.log('---data---', data)
+    const datetime = new Date().getTime()
     ctx.cookies.set('userid', data._id, {
-      expires: new Date('2019-2-17')
+      expires: new Date(datetime + 60 * 60 * 24 * 1000),
+      httpOnly: "true"
     })
     ctx.body = { code: 0, msg: '登陆成功', data }
   } else {
@@ -24,9 +27,7 @@ router.post('/login', async (ctx) => {
 router.post('/register', async (ctx) => {
   //ctx.body = { code: 0, msg: '获取成功' }
   const { user, pwd, type } = ctx.request.body
-  console.log(ctx.request.body)
   const data = await User.findOne({ user })
-  console.log(data)
   if (data) {
     ctx.body = { code: 1, msg: '用户名已存在' }
   } else {
@@ -45,8 +46,11 @@ router.get('/info', async (ctx, next) => {
     ctx.body = { code: 2, msg: '没有登录或登录已过期' }
   } else {
     const result = await User.findOne({ _id: userid }, _filter)
+    console.log(result)
     if (result) {
       ctx.body = { code: 0, msg: '获取成功', data: result }
+    } else {
+      ctx.body = { code: 1, msg: '获取失败' }
     }
   }
 })
