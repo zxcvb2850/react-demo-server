@@ -73,8 +73,10 @@ router.post('/update', async (ctx) => {
   if (verificatCookie) {
     const userid = await ctx.cookies.get('userid')
     const body = ctx.request.body
+    console.log('----------', body)
+    console.log('--userid--', userid)
     body.avatar = body.icon
-    const result = await User.findOneAndUpdate(userid, body, { pwd: 0, __v: 0 })
+    const result = await User.findByIdAndUpdate(userid, body, { pwd: 0, __v: 0 })
     console.log('*******', result)
     if (result) {
       ctx.body = { code: 0, msg: '成功', data: { user: result.user, type: result.type, avatar: result.avatar, company: result.company, desc: result.desc, title: result.title, money: result.money } }
